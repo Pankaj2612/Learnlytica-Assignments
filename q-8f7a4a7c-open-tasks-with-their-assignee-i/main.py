@@ -41,4 +41,38 @@ def open_tasks_with_assignee(users, tasks):
     # Load users and tasks into an in-memory sqlite3 DB, INNER JOIN them on
     # assignee_id, keep only tasks whose status != 'done', and return a list of
     # (task_title, assignee_name) tuples ordered by task title.
-    pass
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE tasks (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        status TEXT,
+        assignee_id INTEGER
+        )
+    """)
+    for t in tasks:
+        cursor.execute("INSERT INTO tasks VALUES (?,?,?,?)",(t['id'],t['title'],t['status'],t['assignee_id']))
+
+    for u in users:
+        cursor.execute("INSERT INTO users VALUES (?,?)",(u['id'],u['name']))
+    
+    
+
+    cursor.execute("""
+            SELECT title,name from tasks
+            INNER JOIN users on users.id = tasks.assignee_id
+            WHERE status != 'done'
+            ORDER BY title ASC
+     """)
+    return [ (i[0],i[1]) for i in  cursor.fetchall()]
+    
+
+print(open_tasks_with_assignee(sample_users(),sample_tasks()))

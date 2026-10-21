@@ -53,10 +53,7 @@ def alt_tasks()
 def open_tasks_with_assignee(users, tasks)
 ```
 
-> **Runtime:** your code is graded on **Python 3.9**, which may be
-> older than the Python in your editor. Avoid `match` statements and `int | None` style unions
-> in annotations — they run fine locally and fail on the grader. Plain `def f(x):` and
-> `typing.Optional[int]` are always safe.
+> **Runtime:** your code is graded on **Python 3.11**, the same version as the Python in your editor. Modern syntax is fine — `match` statements and `int | None` unions in annotations both work.
 >
 > **`return` your answer — never `print` it.** A printed value is not a returned value, and the
 > grader only reads what you return.
