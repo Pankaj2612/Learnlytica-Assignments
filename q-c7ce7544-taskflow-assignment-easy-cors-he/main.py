@@ -3,13 +3,12 @@ def build_cors_headers(origin, allowed_origins):
     Allowed origin -> echo it with methods + credentials.
     Denied/empty  -> {'Access-Control-Allow-Origin': 'null'}.
     """
-    # TODO: implement
-    if origin is None or origin.strip == "" or origin not in allowed_origins:
+    if not origin or origin not in allowed_origins:
         return {'Access-Control-Allow-Origin': 'null'}
-    
+
     return {
-          'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-              'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+      'Access-Control-Allow-Credentials': 'true',
+    }
               }
-    

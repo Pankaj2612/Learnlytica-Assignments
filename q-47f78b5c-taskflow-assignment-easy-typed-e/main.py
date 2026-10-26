@@ -19,14 +19,19 @@ class TaskFlowError(Exception):
 # TODO: define ValidationError, NotFoundError, PermissionDeniedError, ConflictError
 class ValidationError(TaskFlowError):
     status = 422
-    code =  "validation_error"   
+    code = 'validation_error'
+
 class NotFoundError(TaskFlowError):
-    status = 422
-    code =  "validation_error"   
-class ValidationError(TaskFlowError):
-    status = 422
-    code =  "validation_error"   
+    status = 404
+    code = 'not_found'
+
+class PermissionDeniedError(TaskFlowError):
+    status = 403
+    code = 'permission_denied'
+
+class ConflictError(TaskFlowError):
+    status = 409
+    code = 'conflict'
 
 def error_response(exc):
-    # TODO: return the JSON error body dict
-    pass
+    return {'status': exc.status, 'code': exc.code, 'message': str(exc)}

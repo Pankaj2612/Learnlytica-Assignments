@@ -29,6 +29,28 @@ def apply_ops(seed, ops):
         session.commit()
         for op in ops:
             kind = op["op"]
-            # TODO: handle "create", "update_status", "rename", "delete"
-            pass
-        # TODO: build and return the {"count","tasks"} summary
+            if kind == "create":
+                session.add(Task(title=op["title"], status=op.get("status", "todo")))
+                session.flush()
+            elif kind == "update_status":
+                task = session.get(Task, op["id"])
+                if task is not None:
+                    task.status = op["status"]
+            elif kind == "rename":
+                task = session.get(Task, op["id"])
+                if task is not None:
+                    task.title = op["title"]
+            elif kind == "delete":
+                task = session.get(Task, op["id"])
+                if task is not None:
+                    session.delete(task)
+
+        session.commit()
+        tasks = session.query(Task).order_by(Task.id).all()
+        return {
+            "count": len(tasks),
+            "tasks": [
+                {"id": task.id, "title": task.title, "status": task.status}
+                for task in tasks
+            ],
+        }

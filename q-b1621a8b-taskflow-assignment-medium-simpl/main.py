@@ -1,15 +1,28 @@
 class SimpleCache:
     def __init__(self):
-        raise NotImplementedError("Write your solution here")
+        self._entries = {}
     def set(self, key, value, now, ttl):
-        # store (value, expiry) and return self
-        raise NotImplementedError("Write your solution here")
+        self._entries[key] = (value, now + ttl)
+        return self
     def get(self, key, now):
-        # return value if present and now < expiry, else None (and drop if expired)
-        raise NotImplementedError("Write your solution here")
+        entry = self._entries.get(key)
+        if entry is None:
+            return None
+        value, expires_at = entry
+        if now >= expires_at:
+            del self._entries[key]
+            return None
+        return value
     def get_or_set(self, key, loader, now, ttl):
-        # return live cached value, else load+store+return
-        raise NotImplementedError("Write your solution here")
+        entry = self._entries.get(key)
+        if entry is not None:
+            value, expires_at = entry
+            if now < expires_at:
+                return value
+            del self._entries[key]
+        value = loader()
+        self.set(key, value, now, ttl)
+        return value
     def invalidate(self, key):
-        # remove key if present; return self
-        raise NotImplementedError("Write your solution here")
+        self._entries.pop(key, None)
+        return self

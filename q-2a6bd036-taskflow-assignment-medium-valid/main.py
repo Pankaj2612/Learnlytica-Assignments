@@ -26,9 +26,46 @@ class ValidationError(TaskFlowError):
         self.field = field
 
 def validate_task(payload):
-    # TODO: raise ValidationError on the first invalid field; return normalized dict on success
-    pass
+    if not isinstance(payload, dict):
+        raise ValidationError('payload must be an object', field=None)
+
+    title = payload.get('title')
+    if not isinstance(title, str) or not title.strip():
+        raise ValidationError('title is required', field='title')
+
+    status = payload.get('status', 'todo')
+    if not isinstance(status, str) or status not in {'todo', 'in_progress', 'done'}:
+        raise ValidationError('status is invalid', field='status')
+
+    priority = payload.get('priority', 'medium')
+    if not isinstance(priority, str) or priority not in {'low', 'medium', 'high'}:
+        raise ValidationError('priority is invalid', field='priority')
+
+    if 'estimate_hours' in payload:
+        estimate_hours = payload['estimate_hours']
+        if (
+            isinstance(estimate_hours, bool)
+            or not isinstance(estimate_hours, (int, float))
+            or not estimate_hours >= 0
+        ):
+            raise ValidationError(
+                'estimate_hours must be a non-negative number',
+                field='estimate_hours',
+            )
+
+    return {'title': title.strip(), 'status': status, 'priority': priority}
 
 def submit_task(payload):
-    # TODO: call validate_task inside try/except and shape the response
-    pass
+    try:
+        task = validate_task(payload)
+    except ValidationError as exc:
+        return {
+            'ok': False,
+            'error': {
+                'status': 422,
+                'code': 'validation_error',
+                'message': str(exc),
+                'field': exc.field,
+            },
+        }
+    return {'ok': True, 'task': task}
