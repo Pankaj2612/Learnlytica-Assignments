@@ -7,4 +7,11 @@ class TaskService:
     def overdue_count(self):
         # TODO: a task is overdue when it HAS a due date, is NOT 'done',
         # and its due date is STRICTLY before clock(). Return the count.
-        pass
+        today = self.clock()
+        return sum(
+            1
+            for task in self.repo()
+            if task.get("due") is not None
+            and task.get("status") != "done"
+            and task["due"] < today
+        )
